@@ -1,9 +1,13 @@
+// Basic settings
 var settings = {
   width: 640,
   height: 480,
+  radius: 10,
   enemyCount: 10
 }
 
+
+//Create actor data
 var playerData = [{
   x: settings.width/2,
   y: settings.height/2
@@ -17,6 +21,17 @@ for(var i = 0; i <= settings.enemyCount; i++){
   });
 }
 
+
+// Create drag behavior
+var drag = d3.behavior.drag()
+  .on('drag', function(){
+    d3.select(this)
+      .attr('cx', Math.max(settings.radius, Math.min(settings.width - settings.radius, d3.event.x)))
+      .attr('cy', Math.max(settings.radius, Math.min(settings.height - settings.radius, d3.event.y)));
+  });
+
+
+// Create gameBoard
 var gameBoard = d3.select('body').append('svg')
   .attr('class', 'gameBoard')
   .attr('width', settings.width)
@@ -32,13 +47,16 @@ gameBoard.append('rect')
   .style('stroke-width', 1);
 
 
+// Create actors
 var player = gameBoard.selectAll('circle').data(playerData)
   .enter().append('circle')
     .attr('class', 'player')
     .attr('fill', 'crimson')
     .attr('cx', function(item){return item.x})
     .attr('cy', function(item){return item.y})
-    .attr('r', 10);
+    .attr('r', settings.radius);
+
+player.call(drag);
 
 var enemies = gameBoard.selectAll('circle').data(enemyData)
   .enter().append('circle')
@@ -54,6 +72,8 @@ var enemyTurn = function(){
   }
 }
 
+
+// Update
 setInterval(function(){
   enemyTurn();
   enemies
