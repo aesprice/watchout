@@ -3,7 +3,7 @@ var settings = {
   width: 640,
   height: 480,
   radius: 10,
-  enemyCount: 10
+  enemyCount: 30
 }
 
 
@@ -22,13 +22,24 @@ for(var i = 0; i <= settings.enemyCount; i++){
 }
 
 
-// Create drag behavior
+// Create behavior
 var drag = d3.behavior.drag()
   .on('drag', function(){
     d3.select(this)
       .attr('cx', Math.max(settings.radius, Math.min(settings.width - settings.radius, d3.event.x)))
       .attr('cy', Math.max(settings.radius, Math.min(settings.height - settings.radius, d3.event.y)));
   });
+
+var checkForCollision = function(){
+  enemies.each(function(){
+    enemy = d3.select(this);
+    player = d3.select('.player');
+    var distance = Math.sqrt(Math.pow(enemy.attr('cx') - player.attr('cx'), 2) + Math.pow(enemy.attr('cy') - player.attr('cy'), 2));
+    if(distance < (settings.radius * 2)){
+      console.log('YOU LOSE');
+    }
+  });
+};
 
 
 // Create gameBoard
@@ -80,5 +91,7 @@ setInterval(function(){
     .transition()
       .duration(1000)
       .attr('cx', function(item){return item.x;})
-      .attr('cy', function(item){return item.y;})
-}, 1000)
+      .attr('cy', function(item){return item.y;});
+}, 1000);
+
+setInterval(checkForCollision, 100);
