@@ -7,7 +7,7 @@ var settings = {
 }
 
 
-//Create actor data
+// Create data
 var playerData = [{
   x: settings.width/2,
   y: settings.height/2
@@ -20,6 +20,12 @@ for(var i = 0; i <= settings.enemyCount; i++){
     y: Math.random() * settings.height
   });
 }
+
+var scoreData = {
+  high: 0,
+  score: 0,
+  lost: 0
+};
 
 
 // Create behavior
@@ -36,7 +42,12 @@ var checkForCollision = function(){
     player = d3.select('.player');
     var distance = Math.sqrt(Math.pow(enemy.attr('cx') - player.attr('cx'), 2) + Math.pow(enemy.attr('cy') - player.attr('cy'), 2));
     if(distance < (settings.radius * 2)){
-      console.log('YOU LOSE');
+      if(scoreData.high < scoreData.score){
+        scoreData.high = scoreData.score
+        d3.select('.high').text('HIGH SCORE: ' + scoreData.high)
+      }
+      scoreData.score = 0;
+      scoreData.lost++;
     }
   });
 };
@@ -94,4 +105,9 @@ setInterval(function(){
       .attr('cy', function(item){return item.y;});
 }, 1000);
 
-setInterval(checkForCollision, 100);
+setInterval(function(){
+  checkForCollision();
+  scoreData.score += 1;
+  d3.select('.current').text('SCORE: ' + scoreData.score);
+  d3.select('.collisions').text('FAILURES: ' + scoreData.lost);
+}, 100);
